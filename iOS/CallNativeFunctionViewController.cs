@@ -17,17 +17,36 @@ namespace WebViewInteraction.iOS
 		{
 			base.ViewDidLoad ();
 
-			webView.LoadHtmlString (@"<html><head><title>Local String</title><style type='text/css'>p{font-family : Verdana; color : purple }</style><script language='JavaScript'> function msg(){ window.location = 'callfrompage://Hi'  }</script></head><body><p>Hello World!</p><br /><button type='button' onclick='msg()' text='Hi'>Hi</button></body></html>", null);
+			webView.LoadHtmlString (@"
+			<html>
+				<head>
+					<title>Local String</title>
+					<style type='text/css'>p{font-family : Verdana; color : purple }</style>
+					<script language='JavaScript'> 
+						function msg(){ 
+							window.location = 'shirly://Hi'  
+						}
+					</script>
+				</head>
+				<body>
+					<p>Hello World!</p><br />
+					<button type='button' onclick='msg()' text='Hi'>Hi</button>
+				</body>
+			</html>", null);
 
-			webView.ShouldStartLoad = delegate(UIWebView webView, NSUrlRequest request, UIWebViewNavigationType navigationType) {
+			webView.ShouldStartLoad = 
+				delegate(UIWebView webView, 
+					NSUrlRequest request, 
+					UIWebViewNavigationType navigationType) {
 
 				var requestString = request.Url.AbsoluteString;
 
 				var components = requestString.Split ( new[]{ @"://"}, StringSplitOptions.None);
 
-				if (components.Length > 1 && components [0] == @"callfrompage") {
+				if (components.Length > 1 && components [0].ToLower() == @"shirly".ToLower()) {
 
 					if (components [1] == @"Hi") {
+						
 						UIAlertController alert = UIAlertController.Create (@"Hi Title", @"當然是世界好", UIAlertControllerStyle.Alert);
 
 
