@@ -43,6 +43,7 @@ namespace WebViewInteraction.Droid
 			client.WebViewLocaitonChanged += (object sender, ContentWebViewClient.WebViewLocaitonChangedEventArgs e) => {
 
 				Debug.WriteLine(  e.CommandString );
+
 			};
 
 			client.WebViewLoadCompleted += (object sender, ContentWebViewClient.WebViewLoadCompletedEventArgs e) => {
@@ -59,6 +60,7 @@ namespace WebViewInteraction.Droid
 			MyWebView = FindViewById <WebView>(Resource.Id.webview);
 			// NOTICE : 先換成一般的 WebViewClient
 			MyWebView.SetWebViewClient(client);
+			//MyWebView.SetWebViewClient(new MyWebClient());
 			MyWebView.Settings.JavaScriptEnabled = true;
 			MyWebView.Settings.UserAgentString = @"Android";
 
@@ -82,7 +84,6 @@ namespace WebViewInteraction.Droid
 			//MyWebView.LoadUrl ("http://stackoverflow.com/");
 			// 載入以下程式碼進行互動
 
-
 			MyWebView.LoadDataWithBaseURL (
 				null
 				,@"<html>
@@ -95,7 +96,7 @@ namespace WebViewInteraction.Droid
 							</script>
 						</head>
 						<body><p>Hello World!</p><br />
-							<button type='button' onclick='TP.CallFromPage(lookup)' text='Hi'>Hi</button>
+							<button type='button' onclick='TP.CallFromPage(lookup)' text='Hi From Page'>Hi From Page</button>
 						</body>
 					</html>"
 				, "text/html"
@@ -112,7 +113,7 @@ namespace WebViewInteraction.Droid
 				(InputMethodManager)GetSystemService(Context.InputMethodService);
 
 
-			//
+			/*
 			TxtUrl = FindViewById<EditText> (Resource.Id.txtUrl);
 
 			TxtUrl.TextChanged += (object sender,
@@ -120,17 +121,21 @@ namespace WebViewInteraction.Droid
 
 				Debug.WriteLine( TxtUrl.Text +":"+ e.Text );
 
-
-
 			};
 
+			*/
+			
 			#endregion
 
 
 			BtnGo = FindViewById<Button> (Resource.Id.btnGo);
 			BtnGo.Click += (object sender, EventArgs e) => {
 
-				MyWebView.EvaluateJavascript( @"alert('Hi');", callResult );
+				RunOnUiThread(()=>{
+
+					MyWebView.EvaluateJavascript( @"msg();", callResult );
+				});
+
 				/*
 				var url = TxtUrl.Text.Trim() ;
 
@@ -156,12 +161,12 @@ namespace WebViewInteraction.Droid
 				RunOnUiThread (() => {
 					alert.Show();
 				} );
-				*/
+
 				// 
 				_InputMethodManager.HideSoftInputFromWindow( 
 					TxtUrl.WindowToken, 
 					HideSoftInputFlags.None );
-
+				*/
 			};
 
 
@@ -251,6 +256,8 @@ namespace WebViewInteraction.Droid
 
 		}
 
+		public class MyWebClient : WebViewClient{}
+
 		public class ContentWebViewClient : WebViewClient
 		{
 
@@ -272,6 +279,7 @@ namespace WebViewInteraction.Droid
 				return base.ShouldOverrideUrlLoading (view, url);
 
 			}
+
 
 			public override void OnPageFinished (WebView view, string url)
 			{
