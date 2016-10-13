@@ -59,8 +59,9 @@ namespace WebViewInteraction.Droid
 
 			MyWebView = FindViewById <WebView>(Resource.Id.webview);
 			// NOTICE : 先換成一般的 WebViewClient
-			MyWebView.SetWebViewClient(client);
-			//MyWebView.SetWebViewClient(new MyWebClient());
+			//MyWebView.SetWebViewClient(client);
+			MyWebView.SetWebViewClient(new MyWebClient());
+
 			MyWebView.Settings.JavaScriptEnabled = true;
 			MyWebView.Settings.UserAgentString = @"Android";
 
