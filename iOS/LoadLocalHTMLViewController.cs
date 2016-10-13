@@ -17,7 +17,18 @@ namespace WebViewInteraction.iOS
 		{
 			base.ViewDidLoad ();
 
-			webView.LoadHtmlString (@"<html><head><title>Local String</title><style type='text/css'>p{font-family : Verdana; color : purple }</style><script language='JavaScript'> function msg(){alert('Hi !');}</script></head><body><p>Hello World!</p><br /><button type='button' onclick='msg()' text='Hi'>Hi</button></body></html>", null);
+			webView.LoadHtmlString (@"
+			<html>
+				<head>
+				<title>Local String</title>
+				<style type='text/css'>p{font-family : Verdana; color : purple }</style>
+				<script language='JavaScript'> function msg(){alert('Hi !');}</script>
+				</head>
+				<body>
+				<p>Hello World!</p><br />
+				<button type='button' onclick='msg()' text='Hi'>Hi</button>
+				</body>
+			</html>", null);
 
 		}
 

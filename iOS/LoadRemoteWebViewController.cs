@@ -17,7 +17,8 @@ namespace WebViewInteraction.iOS
 		{
 			base.ViewDidLoad ();
 
-			webView.LoadRequest (new NSUrlRequest (new NSUrl (@"http://www.china-airlines.com/ch/index.html")));
+			webView.LoadRequest (new NSUrlRequest (
+				new NSUrl (@"https://www.google.com")));
 			// Note : 
 			//webView.ScalesPageToFit = true;
 
