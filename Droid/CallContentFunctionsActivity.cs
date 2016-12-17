@@ -1,24 +1,17 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
-using System.Collections.Generic;
 
 using Android.OS;
 using Android.App;
-using Android.Views;
 using Android.Webkit;
 using Android.Widget;
 using Android.Content;
-using Android.Runtime;
 using Android.Views.InputMethods;
-
-using Java.Interop;
 using static System.Console;
 
 
 namespace WebViewInteraction.Droid
 {
-	[Activity (Label = "CallContentFunctionsActivity")]
+	[Activity(Label = "CallContentFunctionsActivity")]
 	public class CallContentFunctionsActivity : Activity
 	{
 		private WebView MyWebView { get; set; }
@@ -26,58 +19,63 @@ namespace WebViewInteraction.Droid
 		private Button BtnGo { get; set; }
 		private InputMethodManager _InputMethodManager;
 
-		protected override void OnCreate (Bundle savedInstanceState)
+		protected override void OnCreate(Bundle savedInstanceState)
 		{
-			base.OnCreate (savedInstanceState);
+			base.OnCreate(savedInstanceState);
 
 			//
-			SetContentView (Resource.Layout.Main);
+			SetContentView(Resource.Layout.Main);
 
 
 			//
-			TxtUrl = FindViewById<EditText> (Resource.Id.txtUrl);
+			TxtUrl = FindViewById<EditText>(Resource.Id.txtUrl);
 
 			_InputMethodManager =
-				(InputMethodManager)GetSystemService (Context.InputMethodService);
-			_InputMethodManager.HideSoftInputFromWindow (
+				(InputMethodManager)GetSystemService(Context.InputMethodService);
+			_InputMethodManager.HideSoftInputFromWindow(
 					TxtUrl.WindowToken,
 					HideSoftInputFlags.None);
 
 			//
-			var client = new ContentWebViewClient ();
+			var client = new ContentWebViewClient();
 
-			client.WebViewLocaitonChanged += (sender, e) => {
+			client.WebViewLocaitonChanged += (sender, e) =>
+			{
 
-				WriteLine ($"{ e.CommandString }");
+				WriteLine($"{ e.CommandString }");
 			};
 
 			// 
-			MyWebView = FindViewById<WebView> (Resource.Id.webview);
-			MyWebView.SetWebViewClient (client);
+			MyWebView = FindViewById<WebView>(Resource.Id.webview);
+			MyWebView.SetWebViewClient(client);
 			MyWebView.Settings.JavaScriptEnabled = true;
 
 			// 負責與頁面溝通 - Native -> WebView
-			JavaScriptResult callResult = new JavaScriptResult ();
-			callResult.JavaScriptResultReceived += (object sender, JavaScriptResult.JavaScriptResultReceivedEventArgs e) => {
+			JavaScriptResult callResult = new JavaScriptResult();
+			callResult.JavaScriptResultReceived += (object sender, JavaScriptResult.JavaScriptResultReceivedEventArgs e) =>
+			{
 
-				WriteLine (e.Result);
+				WriteLine(e.Result);
 
-				RunOnUiThread (() => {
+				RunOnUiThread(() =>
+				{
 					TxtUrl.Text = e.Result;
 				});
-				  
+
 			};
 
 			//
-			BtnGo = FindViewById<Button> (Resource.Id.btnGo);
-			BtnGo.Click += (sender, e) => { 
-				RunOnUiThread(()=>{
-					MyWebView.EvaluateJavascript( @"msg( 1234  );", callResult );
+			BtnGo = FindViewById<Button>(Resource.Id.btnGo);
+			BtnGo.Click += (sender, e) =>
+			{
+				RunOnUiThread(() =>
+				{
+					MyWebView.EvaluateJavascript(@"msg( 1234  );", callResult);
 				});
-			
+
 			};
 
-			MyWebView.LoadDataWithBaseURL (
+			MyWebView.LoadDataWithBaseURL(
 				null
 				, @"<html>
 						<head>
@@ -102,18 +100,20 @@ namespace WebViewInteraction.Droid
 		public class JavaScriptResult : Java.Lang.Object, IValueCallback
 		{
 
-			public void OnReceiveValue (Java.Lang.Object result)
+			public void OnReceiveValue(Java.Lang.Object result)
 			{
 				Java.Lang.String json = (Java.Lang.String)result;
 
-				var resultString = json.ToString ();
+				var resultString = json.ToString();
 
 				EventHandler<JavaScriptResultReceivedEventArgs> handler =
 					JavaScriptResultReceived;
 
-				if (null != handler) {
-					handler (this,
-						new JavaScriptResultReceivedEventArgs {
+				if (null != handler)
+				{
+					handler(this,
+						new JavaScriptResultReceivedEventArgs
+						{
 							Result = resultString ?? ""
 						});
 				}

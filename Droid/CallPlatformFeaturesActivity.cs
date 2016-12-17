@@ -1,67 +1,63 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
-using System.Collections.Generic;
 
 using Android.OS;
 using Android.App;
-using Android.Views;
 using Android.Webkit;
 using Android.Widget;
 using Android.Content;
-using Android.Runtime;
-using Android.Views.InputMethods;
 
 using Java.Interop;
 using static System.Console;
 
 namespace WebViewInteraction.Droid
 {
-	[Activity (Label = "CallPlatformFeaturesActivity")]
+	[Activity(Label = "CallPlatformFeaturesActivity")]
 	public class CallPlatformFeaturesActivity : Activity
 	{
 		private WebView MyWebView { get; set; }
 		private EditText TxtUrl { get; set; }
 		private Button BtnGo { get; set; }
 
-		protected override void OnCreate (Bundle savedInstanceState)
+		protected override void OnCreate(Bundle savedInstanceState)
 		{
-			base.OnCreate (savedInstanceState);
+			base.OnCreate(savedInstanceState);
 
 			//
-			SetContentView (Resource.Layout.Main);
+			SetContentView(Resource.Layout.Main);
 
 			//
-			var client = new ContentWebViewClient ();
+			var client = new ContentWebViewClient();
 
 			// 
-			MyWebView = FindViewById<WebView> (Resource.Id.webview);
-			MyWebView.SetWebViewClient (client);
+			MyWebView = FindViewById<WebView>(Resource.Id.webview);
+			MyWebView.SetWebViewClient(client);
 			MyWebView.Settings.JavaScriptEnabled = true;
 
 
 
 			// 負責與頁面溝通 - WebView -> Native
-			MyJSInterface myJSInterface = new MyJSInterface (this);
+			MyJSInterface myJSInterface = new MyJSInterface(this);
 
-			MyWebView.AddJavascriptInterface (myJSInterface, "TP");
-			myJSInterface.CallFromPageReceived += delegate (object sender, MyJSInterface.CallFromPageReceivedEventArgs e) {
+			MyWebView.AddJavascriptInterface(myJSInterface, "TP");
+			myJSInterface.CallFromPageReceived += delegate (object sender, MyJSInterface.CallFromPageReceivedEventArgs e)
+			{
 
-				WriteLine (e.Result);
+				WriteLine(e.Result);
 
-				AlertDialog.Builder alert = new AlertDialog.Builder (this);
-				alert.SetTitle ("Info");
-				alert.SetMessage ($"回傳內容 { e.Result }");
+				AlertDialog.Builder alert = new AlertDialog.Builder(this);
+				alert.SetTitle("Info");
+				alert.SetMessage($"回傳內容 { e.Result }");
 
-				alert.SetPositiveButton ("確認", (senderAlert, args) => {});
+				alert.SetPositiveButton("確認", (senderAlert, args) => { });
 
-				RunOnUiThread (() => {
-					alert.Show ();
+				RunOnUiThread(() =>
+				{
+					alert.Show();
 				});
 			};
 
 
-			MyWebView.LoadDataWithBaseURL (
+			MyWebView.LoadDataWithBaseURL(
 				null
 				, @"<html>
 						<head>
@@ -89,23 +85,25 @@ namespace WebViewInteraction.Droid
 		{
 			Context Context { get; set; }
 
-			public MyJSInterface (Context context)
+			public MyJSInterface(Context context)
 			{
-				this.Context = context;
+				Context = context;
 			}
 
 			[Export]
 			[JavascriptInterface]
-			public void CallFromPage (string parameter)
+			public void CallFromPage(string parameter)
 			{
-				WriteLine ($"CallFromPage:{parameter}");
+				WriteLine($"CallFromPage:{parameter}");
 
 				EventHandler<CallFromPageReceivedEventArgs> handler =
 					CallFromPageReceived;
 
-				if (null != handler) {
-					handler (this,
-						new CallFromPageReceivedEventArgs {
+				if (null != handler)
+				{
+					handler(this,
+						new CallFromPageReceivedEventArgs
+						{
 							Result = parameter
 						});
 				}
