@@ -24,7 +24,7 @@ namespace WebViewInteraction.iOS
 					<style type='text/css'>p{font-family : Verdana; color : purple }</style>
 					<script language='JavaScript'> 
 						function msg(){ 
-							window.location = 'shirly://Hi'  
+							window.location = 'liddle://Hi'  
 						}
 					</script>
 				</head>
@@ -43,7 +43,7 @@ namespace WebViewInteraction.iOS
 
 				var components = requestString.Split ( new[]{ @"://"}, StringSplitOptions.None);
 
-				if (components.Length > 1 && components [0].ToLower() == @"shirly".ToLower()) {
+				if (components.Length > 1 && components [0].ToLower() == @"liddle".ToLower()) {
 
 					if (components [1] == @"Hi") {
 						
@@ -60,6 +60,7 @@ namespace WebViewInteraction.iOS
 							Console.WriteLine(@"Cancel");
 						});
 						alert.AddAction (cancelAction);
+
 
 						PresentViewController (alert, true, null);
 
