@@ -61,13 +61,18 @@ namespace WebViewInteraction.Droid
 			callResult.JavaScriptResultReceived += (object sender, JavaScriptResult.JavaScriptResultReceivedEventArgs e) => {
 
 				WriteLine (e.Result);
+
+				RunOnUiThread (() => {
+					TxtUrl.Text = e.Result;
+				});
+				  
 			};
 
 			//
 			BtnGo = FindViewById<Button> (Resource.Id.btnGo);
 			BtnGo.Click += (sender, e) => { 
 				RunOnUiThread(()=>{
-					MyWebView.EvaluateJavascript( @"msg();", callResult );
+					MyWebView.EvaluateJavascript( @"msg( 1234  );", callResult );
 				});
 			
 			};
@@ -80,7 +85,7 @@ namespace WebViewInteraction.Droid
 							<style type='text/css'>p{font-family : Verdana; color : purple }</style>
 							<script language='JavaScript'> 
 								var lookup = '中文訊息'
-								function msg(){ window.location = 'callfrompage://Hi'  }
+								function msg( text ){ return text + ' received';   }
 							</script>
 						</head>
 						<body><p>Hello World!</p><br />
