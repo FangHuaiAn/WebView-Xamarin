@@ -4,77 +4,51 @@ using System;
 
 using Foundation;
 using UIKit;
+using WebKit;
 
 namespace WebViewInteraction.iOS
 {
-	public partial class CallNativeFunctionViewController : UIViewController
+	public partial class CallNativeFunctionViewController : UIViewController, IWKScriptMessageHandler
 	{
 		public CallNativeFunctionViewController (IntPtr handle) : base (handle)
 		{
+
 		}
 
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
-			webView.LoadHtmlString (@"
+			var userController = new WKUserContentController();
+			userController.AddScriptMessageHandler(this, "NOTE_HERE");
+			var config = new WKWebViewConfiguration
+			{
+				UserContentController = userController
+			};
+
+			this.webView = new WKWebView(this.View.Frame, config)
+			{
+				WeakNavigationDelegate = this
+			};
+
+			this.View.AddSubview(webView);
+
+			webView.LoadHtmlString(@"
 			<html>
 				<head>
 					<title>Local String</title>
+					<meta name='viewport' content='width = device-width, initial-scale = 1' />
 					<style type='text/css'>p{font-family : Verdana; color : purple }</style>
-					<script language='JavaScript'> 
-						function msg(){ 
-							window.location = 'liddle://Hi'  
-						}
+					<script language='JavaScript'>
+						function sendData(){window.webkit.messageHandlers.NOTE_HERE.postMessage('from HTML');};
 					</script>
 				</head>
 				<body>
 					<p>Hello World!</p><br />
-					<button type='button' onclick='msg()' text='Hi'>Hi</button>
+					<button type='button' onclick='sendData()' text='sendData'>sendData</button>
 				</body>
 			</html>", null);
 
-			webView.ShouldStartLoad = 
-				delegate(UIWebView webView, 
-					NSUrlRequest request, 
-					UIWebViewNavigationType navigationType) {
-
-				var requestString = request.Url.AbsoluteString;
-
-				var components = requestString.Split ( new[]{ @"://"}, StringSplitOptions.None);
-
-				if (components.Length > 1 && components [0].ToLower() == @"liddle".ToLower()) {
-
-					if (components [1] == @"Hi") {
-						
-						UIAlertController alert = UIAlertController.Create (@"Hi Title", @"當然是世界好", UIAlertControllerStyle.Alert);
-
-
-						UIAlertAction okAction = UIAlertAction.Create (@"OK", UIAlertActionStyle.Default, (action) => {
-							Console.WriteLine(@"OK");
-						});
-						alert.AddAction (okAction);
-
-		
-						UIAlertAction cancelAction = UIAlertAction.Create (@"Cancel", UIAlertActionStyle.Default, (action) =>{
-							Console.WriteLine(@"Cancel");
-						});
-						alert.AddAction (cancelAction);
-
-
-						PresentViewController (alert, true, null);
-
-
-						return false;
-					}
-				
-				}
-
-				return true;
-
-			};
-
-		
 		}
 
 
@@ -84,5 +58,12 @@ namespace WebViewInteraction.iOS
 			base.DidReceiveMemoryWarning ();		
 			// Release any cached data, images, etc that aren't in use.		
 		}
-	}
+
+        public void DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
+        {
+			Console.WriteLine(message.Body.ToString());
+		}
+    }
+
+    
 }

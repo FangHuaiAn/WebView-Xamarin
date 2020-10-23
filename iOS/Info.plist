@@ -10,7 +10,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>WebViewInteraction.iOS</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.your-company.WebViewInteraction.iOS</string>
+	<string>com.tripim.WebViewInteraction.iOS</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
@@ -18,11 +18,10 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MinimumOSVersion</key>
-	<string>8.1</string>
+	<string>14.0</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>
-		<integer>2</integer>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

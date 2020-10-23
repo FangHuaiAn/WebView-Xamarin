@@ -5,6 +5,7 @@ using System.Text;
 
 using Foundation;
 using UIKit;
+using WebKit;
 
 namespace WebViewInteraction.iOS
 {
@@ -18,20 +19,72 @@ namespace WebViewInteraction.iOS
 		{
 			base.ViewDidLoad ();
 
-			webView.LoadHtmlString (@"<html><head><title>Local String</title><style type='text/css'>p{font-family : Verdana; color : purple }</style><script language='JavaScript'> function msg( text ){alert( text );}</script></head><body><p>Hello World!</p><br /><button type='button' onclick='msg()' text='Hi'>Hi</button></body></html>", null);
+			webView.SizeToFit();
+			webView.LoadHtmlString (@"
+            <html>
+                <head>
+                    <title>WebKit WKWebView</title>
+                    <meta name='viewport' content='width = device-width, initial-scale = 1' />
+                </head>
+                <body>
+                    <button type='button' onclick='showAlert()' text='Hi' style='width: 100%; height: 30px ;margin-top:10px'>Just Alert Hi</button><br />
+                    <button type='button' onclick='showConfirm()' text='Hi' style='width: 100%; height: 30px ;margin-top:10px'>Yes or No</button><br />
+                    <button onclick='showPrompt()' style='width: 100%; height: 30px ;margin-top:10px' >Prompt</button><br />
+                    <p id='demo'></p>
+                    <script>
+                        function showAlert(){
+                            alert('Hi 這只是簡單的 alert 功能!');
+                        }
+                        function showConfirm(){
+                            var userAnswer = confirm('你的選擇是？')
+                            if (userAnswer) {
+                                alert('使用者按下確認');
+                            } else {
+                                alert('使用者按下取消');
+                            }
+                        }
+                        function showPrompt() {
+                            var lang = prompt('你現在用什麼程式語言', 'Swift or Kotlin');
+                            if (lang != null) {
+                                document.getElementById('demo').innerHTML = '我也是用' + lang;
+                                return lang;
+                            }
+                        }
+                        function getelement(){
+                            var screenViewport = document.querySelector('meta[name=""viewport""]').content
+                            return screenViewport;
+                        }
 
-		}
+                        function callNativeApp()
+                        {
+                            webkit.messageHandlers.NOTE_HERE.postMessage('注意 NOTE_HERE 的位置。');
+                        }
+                        </script>
+                    </body>
+                </html>", null);
+
+
+            webView.UIDelegate = new MyWKWebViewDelegate(this);
+
+
+        }
 
 		partial void btnMessageClicked (NSObject sender)
 		{
-			var message = new StringBuilder(@"msg('");
-		
-			message.Append( txtMessage.Text );
-			message.Append(@"')");
 
-			webView.EvaluateJavascript(message.ToString() );
+			var js = (NSString) $"document.getElementById('demo').innerHTML = '{txtMessage.Text}'";
 
-
+			WKJavascriptEvaluationResult handler = (NSObject result, NSError err) => {
+				if (err != null)
+				{
+					System.Console.WriteLine(err);
+				}
+				if (result != null)
+				{
+					System.Console.WriteLine(result);
+				}
+			};
+			webView.EvaluateJavaScript(js, handler);
 		}
 
 		public override void DidReceiveMemoryWarning ()
@@ -39,5 +92,48 @@ namespace WebViewInteraction.iOS
 			base.DidReceiveMemoryWarning ();		
 			// Release any cached data, images, etc that aren't in use.		
 		}
+
+        
 	}
+
+
+    public class MyWKWebViewDelegate : WKUIDelegate {
+
+        private UIViewController Controller { get; set; }
+
+        public MyWKWebViewDelegate(UIViewController viewController) {
+            Controller = viewController;
+        }
+
+        public override void RunJavaScriptAlertPanel(WKWebView webView, string message, WKFrameInfo frame, Action completionHandler)
+        {
+            var alert = UIAlertController.Create("Alert", message, UIAlertControllerStyle.Alert);
+            alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
+
+            //Let javascript handle the OK click by passing the completionHandler to the controller
+            Controller.PresentViewController(alert, true, completionHandler);
+        }
+
+        public override void RunJavaScriptConfirmPanel(WKWebView webView, string message, WKFrameInfo frame, Action<bool> completionHandler)
+        {
+            var alert = UIAlertController.Create("Please confirm", message, UIAlertControllerStyle.Alert);
+
+            //Let javascript handle the OK click by passing the completionHandler to the controller
+            alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, action => completionHandler(true)));
+            //Let javascript handle the Cancel click by passing the completionHandler to the controller
+            alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, action => completionHandler(false)));
+
+            Controller.PresentViewController(alert, true, null);
+        }
+
+        public override void RunJavaScriptTextInputPanel(WKWebView webView, string prompt, string defaultText, WKFrameInfo frame, Action<string> completionHandler)
+        {
+            var alert = UIAlertController.Create("Prompt", prompt, UIAlertControllerStyle.Alert);
+            alert.AddTextField(textfield => { textfield.Placeholder = defaultText; });
+            alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, action => completionHandler(alert.TextFields[0].Text)));
+            alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, action => completionHandler(null)));
+            Controller.PresentViewController(alert, true, null);
+        }
+
+    }
 }

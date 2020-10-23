@@ -16,7 +16,7 @@ namespace WebViewInteraction.iOS
 		UIKit.UITextField txtMessage { get; set; }
 
 		[Outlet]
-		UIKit.UIWebView webView { get; set; }
+		WebKit.WKWebView webView { get; set; }
 
 		[Action ("btnMessageClicked:")]
 		partial void btnMessageClicked (Foundation.NSObject sender);

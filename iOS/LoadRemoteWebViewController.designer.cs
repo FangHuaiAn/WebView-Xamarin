@@ -13,7 +13,7 @@ namespace WebViewInteraction.iOS
 	partial class LoadRemoteWebViewController
 	{
 		[Outlet]
-		UIKit.UIWebView webView { get; set; }
+		WebKit.WKWebView webView { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{

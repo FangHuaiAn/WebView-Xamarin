@@ -20,13 +20,15 @@ namespace WebViewInteraction.iOS
 			webView.LoadHtmlString (@"
 			<html>
 				<head>
-				<title>Local String</title>
-				<style type='text/css'>p{font-family : Verdana; color : purple }</style>
-				<script language='JavaScript'> function msg(){alert('Hi !');}</script>
+					<title>Local String</title>
+					<meta name='viewport' content='width = device-width, initial-scale = 1' />
+					<style type='text/css'>p{font-family : Verdana; color : purple }</style>
+					<script language='JavaScript'> function msg(){alert('Hi !');} function changeTest(){ document.getElementById('demo').innerHTML = 'HERE' }</script>
 				</head>
 				<body>
-				<p>Hello World!</p><br />
-				<button type='button' onclick='msg()' text='Hi'>Hi</button>
+					<p id='demo'>Hello World!</p><br />
+					<button type='button' onclick='msg()' text='alert Hi'>alert Hi</button>
+					<button type='button' onclick='changeText()' text='Change Text'>change text</button>
 				</body>
 			</html>", null);
 
